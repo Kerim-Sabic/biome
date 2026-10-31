@@ -72,9 +72,9 @@ impl Rule for UsePlaywrightValidDescribeCallback {
             return None;
         }
 
-        // Get the callback argument (should be the second argument for describe calls)
         let args = call_expr.arguments().ok()?;
-        let [_, callback_arg] = args.get_arguments_by_index([0, 1]);
+        let [callback_arg, callback_with_details] = args.get_arguments_by_index([1, 2]);
+        let callback_arg = callback_with_details.or(callback_arg);
 
         // Check if callback is missing
         let Some(callback_arg) = callback_arg else {
@@ -141,12 +141,12 @@ impl Rule for UsePlaywrightValidDescribeCallback {
             ),
             InvalidReason::MissingCallback => (
                 markup! { "Describe requires a callback function." },
-                markup! { "The second argument to describe must be a function that contains the test definitions." },
-                markup! { "Add a callback function as the second argument to describe." },
+                markup! { "The describe callback must be a function that contains the test definitions." },
+                markup! { "Add a callback function after the title and any test details." },
             ),
             InvalidReason::NotFunction => (
                 markup! { "Describe callback must be a function." },
-                markup! { "The second argument to describe must be a function, not a "<Emphasis>"string"</Emphasis>", "<Emphasis>"number"</Emphasis>", "<Emphasis>"object"</Emphasis>", or other type." },
+                markup! { "The describe callback must be a function, not a "<Emphasis>"string"</Emphasis>", "<Emphasis>"number"</Emphasis>", "<Emphasis>"object"</Emphasis>", or other type." },
                 markup! { "Replace the callback with a function expression or arrow function." },
             ),
         };
